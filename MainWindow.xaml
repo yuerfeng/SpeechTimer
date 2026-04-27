@@ -220,12 +220,19 @@
                     Click="PresetButton_Click" Tag="0:30:0"/>
         </StackPanel>
 
-        <!-- 播放声音选项 -->
-        <CheckBox Grid.Row="4" x:Name="SoundCheckBox"
-                  Content="播放提示音"
-                  Foreground="#888888"
-                  FontSize="12"
-                  HorizontalAlignment="Center"
-                  VerticalContentAlignment="Center"/>
+        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Center">
+            <CheckBox x:Name="SoundCheckBox"
+                      Content="播放提示音"
+                      Foreground="#888888"
+                      FontSize="12"
+                      VerticalContentAlignment="Center"
+                      Margin="0,0,24,0"/>
+            <CheckBox x:Name="OvertimeCheckBox"
+                      Content="允许超时"
+                      Foreground="#888888"
+                      FontSize="12"
+                      VerticalContentAlignment="Center"
+                      IsChecked="True"/>
+        </StackPanel>
     </Grid>
 </Window>

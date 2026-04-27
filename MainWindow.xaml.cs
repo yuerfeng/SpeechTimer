@@ -109,13 +109,13 @@ namespace SpeechTimer
 
     private void Timer_Tick(object sender, EventArgs e)
     {
+      _remainingTime = _remainingTime.Subtract(TimeSpan.FromSeconds(1));
+
       if (_remainingTime.TotalSeconds > 0)
       {
-        _remainingTime = _remainingTime.Subtract(TimeSpan.FromSeconds(1));
         UpdateTimeDisplay();
         UpdateVisualFeedback();
 
-        // 最后10秒每秒播放提示音
         if (_remainingTime.TotalSeconds <= 10 && _remainingTime.TotalSeconds > 0)
         {
           PlayTickSound();
@@ -128,20 +128,43 @@ namespace SpeechTimer
       }
       else
       {
-        _timer.Stop();
-        _isRunning = false;
-        StartButton.IsEnabled = true;
-        PauseButton.IsEnabled = false;
-        StatusDisplay.Text = "时间到！";
-        TimeDisplay.Foreground = new SolidColorBrush(Colors.Red);
+        bool allowOvertime = OvertimeCheckBox.IsChecked == true;
 
-        // 开始持续响铃
-        StartContinuousAlert();
-
-        if (_desktopTimerWindow != null)
+        if (allowOvertime)
         {
-          _desktopTimerWindow.Close();
-          _desktopTimerWindow = null;
+          UpdateTimeDisplay();
+          TimeDisplay.Foreground = new SolidColorBrush(Colors.Red);
+
+          if (_remainingTime.TotalSeconds == 0)
+          {
+            StatusDisplay.Text = "时间到！";
+          }
+          else
+          {
+            StatusDisplay.Text = "已超时";
+          }
+
+          if (_desktopTimerWindow != null)
+          {
+            _desktopTimerWindow.UpdateTime(_remainingTime);
+          }
+        }
+        else
+        {
+          _timer.Stop();
+          _isRunning = false;
+          StartButton.IsEnabled = true;
+          PauseButton.IsEnabled = false;
+          StatusDisplay.Text = "时间到！";
+          TimeDisplay.Foreground = new SolidColorBrush(Colors.Red);
+
+          StartContinuousAlert();
+
+          if (_desktopTimerWindow != null)
+          {
+            _desktopTimerWindow.Close();
+            _desktopTimerWindow = null;
+          }
         }
       }
     }
@@ -185,6 +208,27 @@ namespace SpeechTimer
     {
       if (!_isRunning)
       {
+        if (_remainingTime < TimeSpan.Zero)
+        {
+          _isRunning = true;
+          StartButton.IsEnabled = false;
+          PauseButton.IsEnabled = true;
+          StatusDisplay.Text = "已超时";
+
+          if (_desktopTimerWindow == null)
+          {
+            _desktopTimerWindow = new DesktopTimerWindow();
+            _desktopTimerWindow.Left = 100;
+            _desktopTimerWindow.Top = 100;
+            _desktopTimerWindow.OpenMainWindowRequested += DesktopTimerWindow_OpenMainWindowRequested;
+          }
+          _desktopTimerWindow.Show();
+          _desktopTimerWindow.UpdateTime(_remainingTime);
+
+          _timer.Start();
+          return;
+        }
+
         if (_remainingTime.TotalSeconds <= 0)
         {
           int hours = int.TryParse(HoursInput.Text, out int h) ? h : 0;
@@ -272,7 +316,14 @@ namespace SpeechTimer
 
     private void UpdateTimeDisplay()
     {
-      TimeDisplay.Text = _remainingTime.ToString(@"hh\:mm\:ss");
+      if (_remainingTime < TimeSpan.Zero)
+      {
+        TimeDisplay.Text = "-" + _remainingTime.Negate().ToString(@"hh\:mm\:ss");
+      }
+      else
+      {
+        TimeDisplay.Text = _remainingTime.ToString(@"hh\:mm\:ss");
+      }
     }
 
     private void PlayAlertSound()

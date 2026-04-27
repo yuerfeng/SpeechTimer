@@ -19,20 +19,27 @@ namespace SpeechTimer
 
         public void UpdateTime(TimeSpan time)
         {
-            TimeDisplay.Text = time.ToString(@"hh\:mm\:ss");
-
-            if (time.TotalSeconds <= 10 && time.TotalSeconds > 0)
+            if (time < TimeSpan.Zero)
             {
+                TimeDisplay.Text = "-" + time.Negate().ToString(@"hh\:mm\:ss");
+                TimeDisplay.Foreground = new SolidColorBrush(Colors.Red);
+                WindowBorder.BorderBrush = new SolidColorBrush(Colors.Red);
+            }
+            else if (time.TotalSeconds <= 10 && time.TotalSeconds > 0)
+            {
+                TimeDisplay.Text = time.ToString(@"hh\:mm\:ss");
                 TimeDisplay.Foreground = new SolidColorBrush(Colors.Red);
                 WindowBorder.BorderBrush = new SolidColorBrush(Colors.Red);
             }
             else if (time.TotalSeconds <= 30 && time.TotalSeconds > 10)
             {
+                TimeDisplay.Text = time.ToString(@"hh\:mm\:ss");
                 TimeDisplay.Foreground = new SolidColorBrush(Colors.Yellow);
                 WindowBorder.BorderBrush = new SolidColorBrush(Colors.Yellow);
             }
             else
             {
+                TimeDisplay.Text = time.ToString(@"hh\:mm\:ss");
                 TimeDisplay.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#00B4FF"));
                 WindowBorder.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3300B4FF"));
             }
