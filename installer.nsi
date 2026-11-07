@@ -1,4 +1,7 @@
+﻿Unicode true
+
 !include "MUI2.nsh"
+!include "FileFunc.nsh"
 
 Name "演讲倒计时器"
 OutFile "SpeechTimer_Setup_1.0.0.exe"
